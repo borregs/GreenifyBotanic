@@ -30,7 +30,8 @@
 #define FANRELAY  4
 #define PUMPRELAY 7
 #define LEDRELAY  9
-#define FOTORES   0
+#define FOTORES   A0
+#define YL49PIN   A1
 
 dht11 DHT11;
 
@@ -73,7 +74,7 @@ void loop()
 
 
   //soil humidity  
-  isDry(analogRead(A1))?Serial.print("Si"):Serial.print("NO");
+  isDry(analogRead(YL49PIN))?Serial.print("Si"):Serial.print("NO");
 
 
 	
@@ -81,11 +82,12 @@ void loop()
   delay(2000);
 
 }
-
 float getTemp(){
   Serial.print("Temperature  (C): ");
   Serial.println((float)DHT11.temperature, 2);
 }
+
+
 
 //fotoresister requires LD33V
 int getLumens(int fotoResPin){
@@ -133,7 +135,7 @@ void pulsaBomba(){
 }void pulsaExhale(){
 //TODO
 
-}bool isDHTReady(float h, float t){
+}bool isDHTReady(float h, float t){   
   if (isnan(h) || isnan(t)) {
     Serial.println("Failed to read from DHT sensor!");
     return false;
