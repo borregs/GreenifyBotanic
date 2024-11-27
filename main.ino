@@ -27,7 +27,8 @@
 
 
 #define DHT11PIN  5
-#define FANRELAY  4
+#define IFANRELAY 4
+#define OFANRELAY 3
 #define PUMPRELAY 7
 #define LEDRELAY  9
 #define FOTORES   A0
@@ -38,6 +39,13 @@ dht11 DHT11;
 void  setup()
 {
   Serial.begin(9600);
+
+  pinMode(PUMPRELAY,OUTPUT);
+  pinMode(IFANRELAY,OUTPUT);
+  pinMode(OFANRELAY,OUTPUT);
+  pinMode(LEDRELAY,OUTPUT);
+
+
   Serial.println("################ Bienvenido ####################");
 
   Serial.println(" _____ ____  _____ _____ _      _  ________  _  ");
@@ -51,6 +59,9 @@ void  setup()
   Serial.println("| | //| / \|  / \  | / \|| |\ ||| ||  /         ");
   Serial.println("| |_\\| \_/|  | |  | |-||| | \||| ||  \_        ");
   Serial.println("\____/\____/  \_/  \_/ \|\_/  \|\_/\____/       "); 
+
+
+
 }
 
 void loop()
@@ -63,8 +74,10 @@ void loop()
   
   if(isDHTReady(DHT11.humidity,DHT11.temperature)){
     //si leyo entonces operamos con humedad del aire y temperatura
-    if(isAirWet())
+    if(isAirWet()){
+      pulsaExhale();
       pulsaInhale();
+    }
     getTemp();
   }
   
@@ -86,9 +99,6 @@ float getTemp(){
   Serial.print("Temperature  (C): ");
   Serial.println((float)DHT11.temperature, 2);
 }
-
-
-
 //fotoresister requires LD33V
 int getLumens(int fotoResPin){
   int anaValue = 0;
@@ -127,14 +137,17 @@ bool isDry(int sensorValue){
 	}else;
 }
 void pulsaBomba(){
-//TODO
-
+  digitalWrite(PUMPRELAY,HIGH);
+  delay(500);
+  digitalWrite(PUMPRELAY,LOW);
 }void pulsaInhale(){
-//TODO
-
+  digitalWrite(IFANRELAY,HIGH);
+  delay(500);
+  digitalWrite(IFANRELAY,LOW);
 }void pulsaExhale(){
-//TODO
-
+  digitalWrite(OFANRELAY,HIGH);
+  delay(500);
+  digitalWrite(OFANRELAY,LOW);
 }bool isDHTReady(float h, float t){   
   if (isnan(h) || isnan(t)) {
     Serial.println("Failed to read from DHT sensor!");
@@ -152,8 +165,13 @@ bool isLRDReady(int l){
 bool isAirWet(){
   Serial.print("Humidity (%): ");
   Serial.println((float)DHT11.humidity, 2);
+  
+  if(DHT11.humidity<60){
+    return false;
+  }else if(DHT11.humidity > 60 && DHT11.humidity<80){
+    return false;
+  }else{
+    return true;
+  }
 
-  //no sabemos aun q % es humedo o no
-  //TODO add condition
-  return false;   
 }
