@@ -39,7 +39,6 @@ dht11 DHT11;
 void  setup()
 {
   Serial.begin(9600);
-
   pinMode(PUMPRELAY,OUTPUT);
   pinMode(IFANRELAY,OUTPUT);
   pinMode(OFANRELAY,OUTPUT);
@@ -79,15 +78,18 @@ void loop()
       pulsaInhale();
     }
     getTemp();
+  }else{
+        Serial.println("ERR : No se pudo leer el sensor de la humedad en el aire!");
   }
   
   
-  isLRDReady(getLumens(FOTORES))?Serial.print("Si"):Serial.print("NO");
+  isLRDReady(getLumens(FOTORES))?Serial.print("OK"):Serial.println("ERR : Error al leer el fotoresistor!");
+;
    
 
 
   //soil humidity  
-  isDry(analogRead(YL49PIN))?Serial.print("Si"):Serial.print("NO");
+  isDry(analogRead(YL49PIN))?Serial.print("OK"):Serial.println("ERR : Mala lectura de humedad en la tierra");
 
 
 	
@@ -140,27 +142,22 @@ void pulsaBomba(){
   digitalWrite(PUMPRELAY,HIGH);
   delay(500);
   digitalWrite(PUMPRELAY,LOW);
+  delay(500);
 }void pulsaInhale(){
   digitalWrite(IFANRELAY,HIGH);
   delay(500);
   digitalWrite(IFANRELAY,LOW);
+  delay(500);
 }void pulsaExhale(){
   digitalWrite(OFANRELAY,HIGH);
   delay(500);
   digitalWrite(OFANRELAY,LOW);
+  delay(500);
 }bool isDHTReady(float h, float t){   
-  if (isnan(h) || isnan(t)) {
-    Serial.println("Failed to read from DHT sensor!");
-    return false;
-  }
-  return true;
+  return (isnan(h) || isnan(t))? false : true;
 }
 bool isLRDReady(int l){
-  if (isnan(l)){
-    Serial.println("Failed to read from LIGHT sensor!");
-    return false;
-  } 
-  return true;
+  return (isnan(l))? false : true;
 }
 bool isAirWet(){
   Serial.print("Humidity (%): ");
