@@ -42,34 +42,21 @@ void  setup()
   pinMode(PUMPRELAY,OUTPUT);
   pinMode(IFANRELAY,OUTPUT);
   pinMode(OFANRELAY,OUTPUT);
-  pinMode(LEDRELAY,OUTPUT);
+  //pinMode(LEDRELAY,OUTPUT);
 
 
   Serial.println("################ Bienvenido ####################");
-
-  Serial.println(" _____ ____  _____ _____ _      _  ________  _  ");
-  Serial.println("/  __//  __\/  __//  __// \  /|/ \/    /\  \//  ");
-  Serial.println("| |  _|  \/||  \  |  \  | |\ ||| ||  __\ \  /   ");
-  Serial.println("| |_//|    /|  /_ |  /_ | | \||| || |    / /    ");
-  Serial.println("\____\\_/\_\\____\\____\\_/  \|\_/\_/   /_/     ");
-  Serial.println("                                                 ");
-  Serial.println(" ____  ____  _____  ____  _      _  ____        ");
-  Serial.println("/  __\/  _ \/__ __\/  _ \/ \  /|/ \/   _\       ");
-  Serial.println("| | //| / \|  / \  | / \|| |\ ||| ||  /         ");
-  Serial.println("| |_\\| \_/|  | |  | |-||| | \||| ||  \_        ");
-  Serial.println("\____/\____/  \_/  \_/ \|\_/  \|\_/\____/       "); 
-
-
-
 }
 
 void loop()
 {
-  Serial.println();
+  Serial.println("Started Loop\n");
 
   //leemos al sensor dht 
   int chk = DHT11.read(DHT11PIN);
   //checamos si si leyo
+
+
   
   if(isDHTReady(DHT11.humidity,DHT11.temperature)){
     //si leyo entonces operamos con humedad del aire y temperatura
@@ -79,18 +66,18 @@ void loop()
     }
     getTemp();
   }else{
-        Serial.println("ERR : No se pudo leer el sensor de la humedad en el aire!");
+        Serial.println("ERR : No se pudo leer el sensor de la humedad en el aire!\n");
   }
+  Serial.println("End DHT procedures\n");
   
-  
-  isLRDReady(getLumens(FOTORES))?Serial.print("OK"):Serial.println("ERR : Error al leer el fotoresistor!");
-;
-   
+  isLRDReady(getLumens(FOTORES))?Serial.print("OK\n"):Serial.println("ERR : Error al leer el fotoresistor!\n");
 
+   
+  Serial.println("End LRD process\n");
 
   //soil humidity  
-  isDry(analogRead(YL49PIN))?Serial.print("OK"):Serial.println("ERR : Mala lectura de humedad en la tierra");
-
+  isDry(analogRead(YL49PIN))?Serial.println("ERR : Mala lectura de humedad en la tierra\n"):Serial.print("OK\n");
+  Serial.println("End YL-49 process\n");
 
 	
 
@@ -111,11 +98,13 @@ int getLumens(int fotoResPin){
   }
   
   anaValue = anaValue/10; //promediemos
-  anaValue = map(anaValue, 1023, 0, 0, 100); //OscuridadTotal:0  ==> bn iluminado: 100%
+  anaValue = map(anaValue, 1023, 0, 0, 100); //OscuridadTotal:100%  ==> bn iluminado: 0%
 
-  Serial.print("Luminosidad promedio:  [\b\b ]");
+  anaValue=100-anaValue;
+
+  Serial.print("Luminosidad promedio:  [");
   Serial.print((int)anaValue, DEC);
-  Serial.print("%");
+  Serial.print("%]\n");
   return anaValue;  
 }
   
@@ -126,33 +115,33 @@ bool isDry(int sensorValue){
 
   //  Prints the condition of soil.  Dry, Wet or Perfect
 	if (sensorValue >= 1000){  
-    (Serial.print("Tierra Seca! ): \n Enciendiendo bomba de agua"));
+    (Serial.print("Tierra Seca! ): \n Enciendiendo bomba de agua\n"));
     pulsaBomba();
     return true;
   }else if ((sensorValue <= 999)  && (sensorValue >=901)){
-    (Serial.print("Tierra perfecta! :D   "));
+    (Serial.print("Tierra perfecta! :D   \n"));
     return false;
   }else  if (sensorValue <= 900) {
-    (Serial.print("Tierra muy mojada :o \n Encendiendo extractores"));
+    (Serial.print("Tierra muy mojada :o \n Encendiendo extractores \n"));
     pulsaExhale();
     return false;
 	}else;
 }
 void pulsaBomba(){
   digitalWrite(PUMPRELAY,HIGH);
-  delay(500);
+  delay(1000);
   digitalWrite(PUMPRELAY,LOW);
-  delay(500);
+  delay(1000);
 }void pulsaInhale(){
   digitalWrite(IFANRELAY,HIGH);
-  delay(500);
+  delay(1000);
   digitalWrite(IFANRELAY,LOW);
-  delay(500);
+  delay(1000);
 }void pulsaExhale(){
   digitalWrite(OFANRELAY,HIGH);
-  delay(500);
+  delay(1000);
   digitalWrite(OFANRELAY,LOW);
-  delay(500);
+  delay(1000);
 }bool isDHTReady(float h, float t){   
   return (isnan(h) || isnan(t))? false : true;
 }
